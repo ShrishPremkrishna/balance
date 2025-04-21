@@ -1,26 +1,97 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/stats_screen.dart';
+import 'screens/goals_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
-  runApp(const BalanceApp());
+  runApp(const MyApp());
 }
 
-class BalanceApp extends StatelessWidget {
-  const BalanceApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Balance',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32), // Forest green as primary color
-          brightness: Brightness.dark, // Dark theme by default
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF1A1B1E), // Dark background
+      theme: AppTheme.darkTheme,
+      home: const MainNavigator(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MainNavigator extends StatefulWidget {
+  const MainNavigator({super.key});
+
+  @override
+  State<MainNavigator> createState() => MainNavigatorState();
+
+  static MainNavigatorState? of(BuildContext context) {
+    return context.findAncestorStateOfType<MainNavigatorState>();
+  }
+}
+
+class MainNavigatorState extends State<MainNavigator> {
+  int _selectedIndex = 0;
+  bool? _statsInitialShowSteps;
+
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    StatsScreen(),
+    GoalsScreen(),
+  ];
+
+  void updateIndex(int index, {bool? showSteps}) {
+    setState(() {
+      _selectedIndex = index;
+      _statsInitialShowSteps = showSteps;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Create screens list with updated StatsScreen when needed
+    final screens = [
+      _screens[0],
+      if (_selectedIndex == 1) 
+        StatsScreen(initialShowSteps: _statsInitialShowSteps)
+      else 
+        _screens[1],
+      _screens[2],
+    ];
+
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
       ),
-      home: const HomeScreen(),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+            if (index != 1) {
+              _statsInitialShowSteps = null; // Reset when navigating away from stats
+            }
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart),
+            label: 'Stats',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.track_changes),
+            label: 'Goals',
+          ),
+        ],
+      ),
     );
   }
 }

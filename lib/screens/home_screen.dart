@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
-import '../widgets/stats_card.dart';
+import '../models/friend_models.dart';
+import '../theme/app_theme.dart';
+import '../widgets/tracking_card.dart';
 import '../widgets/leaderboard.dart';
-import 'balance_screen.dart';
-import 'notifications_screen.dart';
+import '../widgets/trend_insight.dart';
+import '../main.dart';
+import 'friend_screen.dart';
+import 'stats_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,140 +17,123 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 1;
+  LeaderboardType _leaderboardType = LeaderboardType.steps;
 
-  final List<Widget> _screens = [
-    const BalanceScreen(),
-    _HomeContent(),
-    const NotificationsScreen(),
+  // TODO: Replace with actual data from a provider
+  final List<User> _mockUsers = [
+    User(
+      id: '1',
+      name: 'Kenny',
+      steps: 30000,
+      screenTime: const Duration(minutes: 30),
+    ),
+    User(
+      id: '2',
+      name: 'Thaarak',
+      steps: 25000,
+      screenTime: const Duration(minutes: 40),
+    ),
+    User(
+      id: '3',
+      name: 'Shrish',
+      steps: 10000,
+      screenTime: const Duration(hours: 1, minutes: 20),
+    ),
+    User(
+      id: '4',
+      name: 'You',
+      steps: 5000,
+      screenTime: const Duration(hours: 1, minutes: 30),
+    ),
+    User(
+      id: '5',
+      name: 'Vipin Deepak',
+      steps: 2000,
+      screenTime: const Duration(hours: 13, minutes: 8),
+    ),
   ];
+
+  void _navigateToStats(bool showSteps) {
+    // Get the MainNavigator state to update the selected index
+    final mainNavigator = MainNavigator.of(context);
+    if (mainNavigator != null) {
+      // Navigate to the stats screen (index 1) with the selected option
+      mainNavigator.updateIndex(1, showSteps: showSteps);
+    }
+  }
+
+  void _onFriendTapped(User user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FriendScreen(
+          friend: Friend.fromUser(user),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _currentIndex == 1 ? AppBar(
-        title: const Text(
-          'Balance',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+      appBar: AppBar(
+        title: const Text('Balance'),
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            // TODO: Implement menu navigation
+            // TODO: Implement menu
           },
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.person_add),
             onPressed: () {
               // TODO: Implement add friend
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.message),
-            onPressed: () {
-              // TODO: Implement messages
-            },
-          ),
         ],
-      ) : null,
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.compass_calibration),
-            label: 'Balance',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
       ),
-    );
-  }
-}
-
-class _HomeContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // Dummy data for demonstration
-    final List<User> leaderboardUsers = [
-      User(id: '1', name: 'Kenny', avatarUrl: '', steps: 30000, screenTime: const Duration(hours: 1)),
-      User(id: '2', name: 'Thaarak', avatarUrl: '', steps: 25000, screenTime: const Duration(hours: 2)),
-      User(id: '3', name: 'You', avatarUrl: '', steps: 10000, screenTime: const Duration(hours: 1, minutes: 30)),
-      User(id: '4', name: 'Shrish', avatarUrl: '', steps: 5000, screenTime: const Duration(hours: 3)),
-      User(id: '5', name: 'Vipin Deepak', avatarUrl: '', steps: 2000, screenTime: const Duration(hours: 2)),
-    ];
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Steps card
-          StatsCard(
-            title: 'Steps',
-            value: '10,000',
-            subtitle: 'Streak: 2 Days',
-            onTap: () {
-              // TODO: Navigate to steps details
-            },
-          ),
-          const SizedBox(height: 16),
-          
-          // Screen time card
-          StatsCard(
-            title: 'Screen Time',
-            value: '1h 30m',
-            subtitle: 'Streak: 2 Days',
-            onTap: () {
-              // TODO: Navigate to screen time details
-            },
-          ),
-          const SizedBox(height: 24),
-          
-          // Leaderboard
-          Leaderboard(users: leaderboardUsers),
-          
-          const SizedBox(height: 24),
-          
-          // Top Trend card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Top Trend:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'You walked the most (2000 steps) from 2 PM - 3 PM.',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                    ),
-                  ),
-                ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              TrackingCard(
+                title: 'Steps:',
+                value: '10,000',
+                streak: 2,
+                progress: 0.8,
+                onTap: () => _navigateToStats(true),
               ),
-            ),
+              TrackingCard(
+                title: 'Screen Time:',
+                value: '1h 30m',
+                streak: 2,
+                progress: 0.6,
+                onTap: () => _navigateToStats(false),
+              ),
+              Leaderboard(
+                users: _mockUsers,
+                currentUserId: '4', // ID for 'You'
+                type: _leaderboardType,
+                onTypeChanged: (type) {
+                  setState(() {
+                    _leaderboardType = type;
+                  });
+                },
+                onUserTap: _onFriendTapped,
+              ),
+              TrendInsight(
+                insightText: _leaderboardType == LeaderboardType.steps
+                    ? 'You walked the most (2000 steps) from 2 PM - 3 PM.'
+                    : 'You were on your phone the most (45 minutes) from 8 PM - 9 PM.',
+                onTap: () {
+                  // TODO: Show detailed insights
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
