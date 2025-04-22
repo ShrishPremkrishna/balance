@@ -10,6 +10,7 @@ class AppTheme {
   static const cardBackground = Color(0xFF1E1E1E);
   static const textLight = Colors.white;
   static const textGrey = Color(0xFF9E9E9E);
+  static const modalBackground = Color(0xFF2C2C2C);
 
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,

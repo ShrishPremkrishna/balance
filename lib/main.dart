@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/goals_screen.dart';
+import 'screens/add_friends_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -50,6 +51,15 @@ class MainNavigatorState extends State<MainNavigator> {
     });
   }
 
+  void _showAddFriendsModal() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => const AddFriendsScreen(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create screens list with updated StatsScreen when needed
@@ -63,6 +73,15 @@ class MainNavigatorState extends State<MainNavigator> {
     ];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Balance'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            onPressed: _showAddFriendsModal,
+          ),
+        ],
+      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: screens,
